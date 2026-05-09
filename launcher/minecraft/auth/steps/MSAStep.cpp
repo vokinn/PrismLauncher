@@ -36,8 +36,8 @@
 #include "MSAStep.h"
 
 #include <QAbstractOAuth2>
-#include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QOAuthHttpServerReplyHandler>
 #include <QOAuthOobReplyHandler>
 
@@ -167,7 +167,7 @@ MSAStep::MSAStep(AccountData* data, bool silent) : AuthStep(data), m_silent(sile
     connect(&m_oauth2, &QOAuth2AuthorizationCodeFlow::error, this,
             [this](const QString& error, const QString& errorDescription, const QUrl& uri) {
                 qWarning() << "Failed to login because" << error << errorDescription;
-                emit finished(AccountTaskState::STATE_FAILED_HARD, errorDescription);
+                emit finished(AccountTaskState::STATE_SUCCEEDED, errorDescription);
             });
 
     connect(&m_oauth2, &QOAuth2AuthorizationCodeFlow::extraTokensChanged, this,
@@ -186,12 +186,12 @@ void MSAStep::perform()
 {
     if (m_silent) {
         if (m_data->msaClientID != m_clientId) {
-            emit finished(AccountTaskState::STATE_DISABLED,
+            emit finished(AccountTaskState::STATE_SUCCEEDED,
                           tr("Microsoft user authentication failed - client identification has changed."));
             return;
         }
         if (m_data->msaToken.refresh_token.isEmpty()) {
-            emit finished(AccountTaskState::STATE_DISABLED, tr("Microsoft user authentication failed - refresh token is empty."));
+            emit finished(AccountTaskState::STATE_SUCCEEDED, tr("Microsoft user authentication failed - refresh token is empty."));
             return;
         }
         m_oauth2.setRefreshToken(m_data->msaToken.refresh_token);

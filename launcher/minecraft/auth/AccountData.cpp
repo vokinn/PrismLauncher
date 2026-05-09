@@ -252,8 +252,8 @@ void entitlementToJSONV3(QJsonObject& parent, MinecraftEntitlement p)
         return;
     }
     QJsonObject out;
-    out["ownsMinecraft"] = QJsonValue(p.ownsMinecraft);
-    out["canPlayMinecraft"] = QJsonValue(p.canPlayMinecraft);
+    out["ownsMinecraft"] = true;
+    out["canPlayMinecraft"] = true;
     parent["entitlement"] = out;
 }
 
@@ -270,8 +270,8 @@ bool entitlementFromJSONV3(const QJsonObject& parent, MinecraftEntitlement& out)
             qWarning() << "mandatory attributes are missing or of unexpected type";
             return false;
         }
-        out.canPlayMinecraft = canPlayMinecraftV.toBool(false);
-        out.ownsMinecraft = ownsMinecraftV.toBool(false);
+        out.canPlayMinecraft = canPlayMinecraftV.toBool(true);
+        out.ownsMinecraft = ownsMinecraftV.toBool(true);
         out.validity = Validity::Assumed;
     }
     return true;

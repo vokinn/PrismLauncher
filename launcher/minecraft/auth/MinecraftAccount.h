@@ -75,6 +75,7 @@ struct AccountProfile {
  * token if the user chose to stay logged in.
  */
 class MinecraftAccount : public QObject, public Usable {
+    friend class ProfileSetupDialog;
     Q_OBJECT
    public: /* construction */
     //! Do not copy accounts. ever.

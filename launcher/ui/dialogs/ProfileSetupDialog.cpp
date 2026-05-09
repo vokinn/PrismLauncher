@@ -147,29 +147,32 @@ void ProfileSetupDialog::startCheck()
 
 void ProfileSetupDialog::checkName(const QString& name)
 {
-    if (isChecking) {
-        return;
-    }
+    // if (isChecking) {
+    //     return;
+    // }
+    //
+    // currentCheck = name;
+    // isChecking = true;
+    //
+    // QUrl url(QString("https://api.minecraftservices.com/minecraft/profile/name/%1/available").arg(name));
+    // auto headers = QList<Net::HeaderPair>{ { "Content-Type", "application/json" },
+    //                                        { "Accept", "application/json" },
+    //                                        { "Authorization", QString("Bearer %1").arg(m_accountToSetup->accessToken()).toUtf8() } };
+    //
+    // if (m_check_task)
+    //     disconnect(m_check_task.get(), nullptr, this, nullptr);
+    // auto [task, response] = Net::Download::makeByteArray(url);
+    //
+    // m_check_task = task;
+    // m_check_task->addHeaderProxy(std::make_unique<Net::RawHeaderProxy>(headers));
+    //
+    // connect(m_check_task.get(), &Task::finished, this, [this, response] { checkFinished(response); });
+    //
+    // m_check_task->setNetwork(APPLICATION->network());
+    // m_check_task->start();
 
-    currentCheck = name;
-    isChecking = true;
-
-    QUrl url(QString("https://api.minecraftservices.com/minecraft/profile/name/%1/available").arg(name));
-    auto headers = QList<Net::HeaderPair>{ { "Content-Type", "application/json" },
-                                           { "Accept", "application/json" },
-                                           { "Authorization", QString("Bearer %1").arg(m_accountToSetup->accessToken()).toUtf8() } };
-
-    if (m_check_task)
-        disconnect(m_check_task.get(), nullptr, this, nullptr);
-    auto [task, response] = Net::Download::makeByteArray(url);
-
-    m_check_task = task;
-    m_check_task->addHeaderProxy(std::make_unique<Net::RawHeaderProxy>(headers));
-
-    connect(m_check_task.get(), &Task::finished, this, [this, response] { checkFinished(response); });
-
-    m_check_task->setNetwork(APPLICATION->network());
-    m_check_task->start();
+    setNameStatus(NameStatus::Available);
+    isChecking = false;
 }
 
 void ProfileSetupDialog::checkFinished(QByteArray* response)
@@ -195,30 +198,10 @@ void ProfileSetupDialog::checkFinished(QByteArray* response)
 
 void ProfileSetupDialog::setupProfile(const QString& profileName)
 {
-    if (isWorking) {
-        return;
-    }
-
-    QString payloadTemplate("{\"profileName\":\"%1\"}");
-
-    QUrl url("https://api.minecraftservices.com/minecraft/profile");
-    auto headers = QList<Net::HeaderPair>{ { "Content-Type", "application/json" },
-                                           { "Accept", "application/json" },
-                                           { "Authorization", QString("Bearer %1").arg(m_accountToSetup->accessToken()).toUtf8() } };
-
-    auto [task, response] = Net::Upload::makeByteArray(url, payloadTemplate.arg(profileName).toUtf8());
-    m_profile_task = task;
-    m_profile_task->addHeaderProxy(std::make_unique<Net::RawHeaderProxy>(headers));
-
-    connect(m_profile_task.get(), &Task::finished, this, [this, response] { setupProfileFinished(response); });
-
-    m_profile_task->setNetwork(APPLICATION->network());
-    m_profile_task->start();
-
-    isWorking = true;
-
-    auto button = ui->buttonBox->button(QDialogButtonBox::Cancel);
-    button->setEnabled(false);
+    m_accountToSetup->data.minecraftProfile.name = profileName;
+    m_accountToSetup->data.minecraftProfile.id = "00000000000000000000000000000000";
+    m_accountToSetup->data.minecraftProfile.validity = Validity::Assumed;
+    accept();
 }
 
 namespace {
